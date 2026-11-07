@@ -14,6 +14,10 @@ public class FSMBot : MonoBehaviour
 
     [Header("FSM State")]
     public BotState currentState = BotState.Idle;
+
+    [Header("Movement")]
+    public Transform[] patrolPoints;
+    private int currentPatrolIndex = 0;
     private NavMeshAgent navAgent;
 
     void Start()
@@ -44,11 +48,18 @@ public class FSMBot : MonoBehaviour
 
     private void Idle()
     {
-        Debug.Log("Bot is idling.");
+        if(patrolPoints.Length > 0)
+        {
+            currentState = BotState.Patrol;
+        }  
     }
     private void Patrol()
     {
-        Debug.Log("Bot is Patrolling.");
+        if (!navAgent.pathPending && navAgent.remainingDistance < 0.5f)
+        {
+            currentPatrolIndex = (currentPatrolIndex + 1) % patrolPoints.Length;
+            navAgent.SetDestination(patrolPoints[currentPatrolIndex].position);
+        }
     }
     private void SeekCover()
     {
