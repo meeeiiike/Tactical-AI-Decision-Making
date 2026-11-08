@@ -249,7 +249,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::FSMBot
   currentState: 0
-  enemyTarget: {fileID: 700086505}
+  enemyTarget: {fileID: 769588737}
   visionRange: 25
   fieldOfView: 90
   obstacleMask:
@@ -298,7 +298,7 @@ GameObject:
   - component: {fileID: 212791814}
   - component: {fileID: 212791813}
   m_Layer: 6
-  m_Name: 'Wall_Cover '
+  m_Name: Wall_Cover  0
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -407,7 +407,7 @@ GameObject:
   m_Component:
   - component: {fileID: 228757441}
   m_Layer: 0
-  m_Name: GameObject (1)
+  m_Name: Waypoint 1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -438,7 +438,7 @@ GameObject:
   m_Component:
   - component: {fileID: 581153782}
   m_Layer: 0
-  m_Name: GameObject
+  m_Name: Waypoint 0
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -472,7 +472,7 @@ GameObject:
   - component: {fileID: 700086503}
   - component: {fileID: 700086502}
   m_Layer: 0
-  m_Name: Cube
+  m_Name: Target
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -802,7 +802,7 @@ MonoBehaviour:
   fieldOfView: 90
   obstacleMask:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 64
   eyePosition: {fileID: 0}
   patrolPoints: []
   coverSearchRadius: 10
@@ -932,7 +932,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1507034291}
   m_Layer: 0
-  m_Name: GameObject (2)
+  m_Name: Waypoint 2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -966,7 +966,7 @@ GameObject:
   - component: {fileID: 1515980289}
   - component: {fileID: 1515980288}
   m_Layer: 6
-  m_Name: Wall_Cover  (1)
+  m_Name: Wall_Cover  1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
