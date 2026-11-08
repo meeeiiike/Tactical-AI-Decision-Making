@@ -17,16 +17,20 @@ public class FSMBot : MonoBehaviour
 
     [Header("Vision & Detection")]
     public Transform enemyTarget;
-    public float visionRane = 25f;
+    public float visionRange = 25f;
     [Range(0,360)] public float fieldOfView = 90f;
     public LayerMask obstacleMask;
     public Transform eyePosition;
     
     [Header("Movement")]
     public Transform[] patrolPoints;
-   
     private int currentPatrolIndex = 0;
     private NavMeshAgent navAgent;
+
+    [Header("Cover")]
+    public float coverSearchRadius = 10f;
+    public float hideBehindOffset = 1f;
+    public bool hasCalculatedCover = false;
 
     void Start()
     {
@@ -67,7 +71,7 @@ public class FSMBot : MonoBehaviour
         Vector3 directionToEnemy = enemyTarget.position - eyePosition.position;
         float distanceToEnemy = directionToEnemy.magnitude;
 
-        if (distanceToEnemy <= visionRane)
+        if (distanceToEnemy <= visionRange)
         {
             float angleToEnemy = Vector3.Angle(eyePosition.forward, directionToEnemy);
             if (angleToEnemy <= fieldOfView / 2f)
@@ -87,6 +91,11 @@ public class FSMBot : MonoBehaviour
         {
             currentState = BotState.Patrol;
         }  
+        if(enemyVisible)
+        {
+            currentState = BotState.Attack;
+            return;
+        }
     }
     private void Patrol(bool enemyVisible)
     {
@@ -96,13 +105,89 @@ public class FSMBot : MonoBehaviour
             currentPatrolIndex = (currentPatrolIndex + 1) % patrolPoints.Length;
             navAgent.SetDestination(patrolPoints[currentPatrolIndex].position);
         }
+        if(enemyVisible)
+        {
+            currentState = BotState.Attack;
+            return;
+        }
+    
     }
     private void SeekCover(bool enemyVisible)
     {
-        Debug.Log("Bot is Seeking Cover.");
+        if(!hasCalculatedCover)
+        {
+            Vector3 coverPosition = CalculateNearestCover();
+            if (coverPosition != Vector3.zero)
+            {
+                navAgent.isStopped = false;
+                navAgent.SetDestination(coverPosition);
+                hasCalculatedCover = true;
+            }
+            else
+            {
+                currentState = BotState.Attack;
+                return;
+            }
+        }
+
+        if(!navAgent.pathPending && navAgent.remainingDistance < 0.5f)
+        {
+            hasCalculatedCover = false;
+            if(!enemyVisible)
+            {
+                currentState = BotState.Idle;
+                return;
+            }
+            else
+            {
+                currentState = BotState.Attack;
+                return;
+            }
+        }
     }
+            
+    
     private void Attack(bool enemyVisible)
     {
-        Debug.Log("Bot is Attacking.");
+        if(!enemyVisible)
+        {
+            navAgent.isStopped = false;
+            currentState = BotState.Idle;
+            return;
+        }
+        navAgent.isStopped = true;
+
+        float simHealth = 40f;
+        if(simHealth < 50f)
+        {
+            hasCalculatedCover = false;
+            currentState = BotState.SeekCover;
+            return;
+        }
+    }
+
+    private Vector3 CalculateNearestCover()
+    {
+        Collider[] coverColliders = Physics.OverlapSphere(transform.position, coverSearchRadius, obstacleMask);
+        Vector3 nearestCover = Vector3.zero;
+        float nearestDistance = Mathf.Infinity;
+
+        foreach(Collider cover in coverColliders)
+        {
+            Vector3 directionFromEnemy = (cover.transform.position - enemyTarget.position).normalized;
+            Vector3 coverPosition = cover.transform.position + (directionFromEnemy * hideBehindOffset);
+            NavMeshHit hit;
+            if(NavMesh.SamplePosition(coverPosition, out hit, 1.0f, NavMesh.AllAreas))
+            {
+                float distanceToCover = Vector3.Distance(transform.position, hit.position);
+                if(distanceToCover < nearestDistance)
+                {
+                    nearestDistance = distanceToCover;
+                    nearestCover = hit.position;
+                }
+            }
+        }
+        return nearestCover;
     }
 }
+
