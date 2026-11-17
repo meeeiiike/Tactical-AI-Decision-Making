@@ -32,6 +32,10 @@ public class FSMBot : MonoBehaviour
     public float hideBehindOffset = 1f;
     public bool hasCalculatedCover = false;
 
+    [Header("Combat")]
+    public HitscanWeapon weapon;
+    public AgentHealth agentHealth;
+
     void Start()
     {
         navAgent = GetComponent<NavMeshAgent>();
@@ -157,12 +161,22 @@ public class FSMBot : MonoBehaviour
         }
         navAgent.isStopped = true;
 
-        float simHealth = 40f;
-        if(simHealth < 50f)
+        // Rotate smoothly towards the enemy target
+        Vector3 lookPos = enemyTarget.position - transform.position;
+        lookPos.y = 0;
+        transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(lookPos), Time.deltaTime * 5f);
+        
+        if(agentHealth != null && agentHealth.CurrentHealth < (agentHealth.maxHealth * 0.5f))
         {
             hasCalculatedCover = false;
-            currentState = BotState.SeekCover;
+            //currentState = BotState.SeekCover;
             return;
+        }
+
+        if(weapon != null && enemyTarget != null)
+        {
+            // Offset the target position slightly to aim for the center mass
+            weapon.Fire(enemyTarget.position + Vector3.up * 1f); 
         }
     }
 
